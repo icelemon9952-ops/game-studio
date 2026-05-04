@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classic Snake | Jade Coil Garden</title>
+  <link rel="stylesheet" href="./jade-coil-garden.css" />
+  <link rel="stylesheet" href="./jade-coil-garden-ui.css" />
+</head>
+<body data-product-skin="garden-classic" data-theme="jade" data-skin="jade">
+  <div class="wrap">
+    <main class="game-shell">
+      <section class="screen-header">
+        <div class="screen-copy">
+          <span class="eyebrow">Handheld Edition</span>
+          <h1>Classic Snake</h1>
+          <p>A cleaner, more traditional board with a clear grid, simple rules, and a steady arcade feel.</p>
+        </div>
+        <div class="header-tags" aria-hidden="true">
+          <span class="tag">18 x 18 Grid</span>
+          <span class="tag">Local Best</span>
+          <span class="tag">Boost Optional</span>
+        </div>
+      </section>
+
+      <div class="topbar">
+        <div class="stat score">
+          <span class="stat-label">Score</span>
+          <strong id="scoreLabel">0</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Best</span>
+          <strong id="bestLabel">0</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Level</span>
+          <strong id="levelLabel">1</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Length</span>
+          <strong id="lengthLabel">4</strong>
+        </div>
+        <div class="stat combo" id="comboStat">
+          <span class="stat-label">Combo</span>
+          <strong id="comboLabel">x1</strong>
+        </div>
+        <div class="stat boost" id="boostStat">
+          <span class="stat-label">Boost</span>
+          <strong id="boostLabel">0 / 6</strong>
+        </div>
+      </div>
+
+      <div class="arena-wrap">
+        <div class="frame-note">
+          <span>Classic grid board</span>
+          <span>Walls wrap, spike cells are fatal</span>
+        </div>
+        <canvas id="game" width="760" height="760" aria-label="Classic Snake playfield"></canvas>
+        <div id="overlay" class="overlay">
+          <div class="overlay-card">
+            <h1 id="overlayTitle">Classic Snake</h1>
+            <p id="overlayLine1">Eat food, wrap through walls, and avoid your tail and spike cells.</p>
+            <p id="overlayLine2">Press <strong>Space</strong> to start a run.</p>
+            <p id="overlayLine3" class="highlight">Walls wrap to the opposite side. Boost only ignores tail collision, and spike cells still end the run.</p>
+            <div id="overlayStats" class="overlay-stats hidden"></div>
+            <section id="productRunSummary" class="product-run-summary hidden" aria-live="polite"></section>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div><strong>Move:</strong> Arrow Keys or WASD. <strong>Boost:</strong> Shift or B. <strong>Pause:</strong> P. <strong>Daily:</strong> C.</div>
+        <div><strong>Restart:</strong> Space. <strong>Mobile:</strong> swipe on the board or use the buttons below.</div>
+      </div>
+
+      <div class="mobile-controls">
+        <button class="touch-btn" data-dir="up">Up</button>
+        <button class="touch-btn accent" data-action="boost">Boost</button>
+        <button class="touch-btn" data-action="pause">Pause</button>
+        <button class="touch-btn" data-dir="left">Left</button>
+        <button class="touch-btn" data-dir="down">Down</button>
+        <button class="touch-btn" data-dir="right">Right</button>
+      </div>
+    </main>
+
+    <aside class="side-panel">
+      <section class="panel-section">
+        <span class="section-kicker">Modes</span>
+        <h2>Game Speed</h2>
+        <p>Choose a pace before you start. The rules stay familiar, but faster modes tighten the board more quickly.</p>
+        <div class="mode-grid">
+          <button class="mode-btn active" data-mode="garden">
+            <strong>Classic</strong>
+            <span>Slower start and a wider combo window.</span>
+          </button>
+          <button class="mode-btn" data-mode="arcade">
+            <strong>Standard</strong>
+            <span>Balanced speed with regular spike growth.</span>
+          </button>
+          <button class="mode-btn" data-mode="overdrive">
+            <strong>Fast</strong>
+            <span>Sharper turns and quicker pressure.</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="panel-section daily-challenge-panel">
+        <span class="section-kicker">Daily Challenge</span>
+        <h2>Today&rsquo;s Route</h2>
+        <p>Three short goals refresh each day. Free play runs and the seeded Daily Coil both move this board forward, so every session can push today&rsquo;s route.</p>
+        <div class="daily-challenge-summary">
+          <article class="product-metric">
+            <span class="readout-label">Date</span>
+            <strong id="dailyChallengeDate">Today</strong>
+          </article>
+          <article class="product-metric">
+            <span class="readout-label">Progress</span>
+            <strong id="dailyChallengeCompletion">0 / 3</strong>
+          </article>
+          <article class="product-metric">
+            <span class="readout-label">Bonus Earned</span>
+            <strong id="dailyChallengeReward">0 / 42</strong>
+          </article>
+        </div>
+        <div id="dailyChallengeList" class="daily-challenge-list" aria-live="polite"></div>
+        <div class="log" id="dailyChallengeLog">A fresh route is ready. Finish runs to move today&rsquo;s challenge board forward.</div>
+      </section>
+
+      <section class="panel-section">
+        <span class="section-kicker">Run Info</span>
+        <h2>Status Panel</h2>
+        <div class="readout-grid">
+          <article class="readout-card">
+            <span class="readout-label">Mode</span>
+            <strong id="modeReadout">Classic</strong>
+          </article>
+          <article class="readout-card">
+            <span class="readout-label">Tempo</span>
+            <strong id="tempoLabel">Slow</strong>
+          </article>
+          <article class="readout-card">
+            <span class="readout-label">Food Taken</span>
+            <strong id="fruitCount">0</strong>
+          </article>
+          <article class="readout-card">
+            <span class="readout-label">Spike Cells</span>
+            <strong id="hazardCount">0</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel-section">
+        <span class="section-kicker">Mastery Track</span>
+        <h2>Career Ladder</h2>
+        <p>Every run now feeds a permanent career track, so strong sessions keep moving the account forward even after a loss.</p>
+        <div class="readout-grid">
+          <article class="readout-card">
+            <span class="readout-label">Career Rank</span>
+            <strong id="careerRank">Rookie</strong>
+          </article>
+          <article class="readout-card">
+            <span class="readout-label">Total Runs</span>
+            <strong id="careerRuns">0</strong>
+          </article>
+          <article class="readout-card">
+            <span class="readout-label">Best Length</span>
+            <strong id="careerBestLength">4</strong>
+          </article>
+          <article class="readout-card">
+            <span class="readout-label">Next Rank</span>
+            <strong id="careerProgress">0 / 120 XP</strong>
+          </article>
+        </div>
+        <div class="log" id="careerGoalText">Play a few runs, push your score, and build your first rank promotion.</div>
+      </section>
+
+      <section class="panel-section">
+        <span class="section-kicker">Run Rewards</span>
+        <h2>Petal Wallet</h2>
+        <p>Every run pays out petals for score, survival, and clean finishes. Spend them on new cabinet skins.</p>
+        <div class="product-wallet-grid">
+          <article class="product-metric">
+            <span class="readout-label">Petals</span>
+            <strong id="walletPetals">0</strong>
+          </article>
+          <article class="product-metric">
+            <span class="readout-label">Lifetime</span>
+            <strong id="walletLifetime">0</strong>
+          </article>
+          <article class="product-metric">
+            <span class="readout-label">Skins Owned</span>
+            <strong id="walletSkins">1 / 4</strong>
+          </article>
+          <article class="product-metric">
+            <span class="readout-label">Next Unlock</span>
+            <strong id="walletNextSkin">Amber Drift</strong>
+          </article>
+        </div>
+        <div class="log" id="walletLog">Finish a run to earn your first petals and begin unlocking the shell collection.</div>
+      </section>
+
+      <section class="panel-section">
+        <span class="section-kicker">Skin Vault</span>
+        <h2>Cabinet Skins</h2>
+        <p>Skins recolor the cabinet, overlays, and board treatment so each unlock gives the handheld a fresh personality.</p>
+        <div id="skinVault" class="skin-vault" aria-live="polite"></div>
+      </section>
+
+      <section class="panel-section">
+        <span class="section-kicker">Guidebook</span>
+        <h2>Onboarding & Controls</h2>
+        <p>Keep the first-run guide handy, or trim the control guidance down once the rules feel automatic.</p>
+        <div class="product-guide-card">
+          <strong id="guideStatus">Full Guidance</strong>
+          <p id="guideHint">Move with Arrow Keys or WASD, trigger Boost with Shift or B, and pause with P whenever you need a reset.</p>
+        </div>
+        <div class="product-inline-actions">
+          <button id="replayOnboardingBtn" class="product-action-btn" type="button">Replay Onboarding</button>
+          <button id="focusSettingsBtn" class="product-action-btn subtle" type="button">Jump to Settings</button>
+        </div>
+      </section>
+
+      <section class="panel-section" id="productSettingsSection">
+        <span class="section-kicker">Settings</span>
+        <h2>Play Preferences</h2>
+        <p>These settings stay saved on this device, so your presentation layer feels consistent every time you come back.</p>
+        <div class="settings-grid">
+          <button id="soundToggle" class="setting-toggle" type="button" aria-pressed="true">
+            <span>Sound</span>
+            <strong>On</strong>
+          </button>
+          <button id="effectsToggle" class="setting-toggle" type="button" aria-pressed="false">
+            <span>Reduced Effects</span>
+            <strong>Off</strong>
+          </button>
+        </div>
+        <div class="guidance-picker" role="group" aria-label="Control guidance">
+          <button class="guidance-btn active" type="button" data-guidance="full">Full</button>
+          <button class="guidance-btn" type="button" data-guidance="compact">Compact</button>
+          <button class="guidance-btn" type="button" data-guidance="off">Off</button>
+        </div>
+        <div class="log" id="settingsLog">Sound is on, visual effects are at full strength, and full control help is visible.</div>
+      </section>
+
+      <section class="panel-section">
+        <span class="section-kicker">Session Log</span>
+        <h2>Last Event</h2>
+        <div class="log" id="eventLog">Select a mode, then press Space to start.</div>
+      </section>
+
+      <section class="panel-section">
+        <span class="section-kicker">Rules</span>
+        <h2>How It Works</h2>
+        <ul class="tip-list">
+          <li>Normal food grows the snake by 1 and bonus food grows it by 2.</li>
+          <li>Every few pickups add a new spike warning, then that cell becomes solid.</li>
+          <li>Crossing a wall wraps you to the opposite side. Boost lets you pass through your own body for a short time, but not spike cells.</li>
+          <li>Food beside spikes becomes Bold Food and pays extra if you commit to the risky route.</li>
+          <li>Every 4 quick pickups without using Boost triggers a Lotus bonus, so clean chains score higher.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+
+  <div id="onboardingModal" class="onboarding-modal hidden" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+    <div class="onboarding-card">
+      <div class="onboarding-progress" id="onboardingProgress">Step 1 of 3</div>
+      <h2 id="onboardingTitle">Welcome to Jade Coil Garden</h2>
+      <p id="onboardingBody">Classic Snake stays readable here: wrap through walls, dodge spikes, and keep your lane clean while the pace rises.</p>
+      <div id="onboardingHighlights" class="onboarding-highlights"></div>
+      <div class="product-inline-actions onboarding-actions">
+        <button id="onboardingBackBtn" class="product-action-btn subtle" type="button">Back</button>
+        <button id="onboardingSkipBtn" class="product-action-btn subtle" type="button">Skip</button>
+        <button id="onboardingNextBtn" class="product-action-btn" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="productToastStack" class="product-toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="./jade-coil-garden.js"></script>
+  <script src="./jade-coil-garden-ui.js"></script>
+</body>
+</html>
